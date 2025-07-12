@@ -14,6 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📱 Progressive Web App (PWA) support
 - 🌐 Multi-language support
 
+## [1.0.1] - 2024-07-12
+
+### Security
+- 🔒 **SECURITY FIX**: Updated Werkzeug from 3.0.1 to >=3.0.6
+- 🛡️ **CVE-2024-34069**: Fixed high severity vulnerability in Werkzeug debugger
+- 📚 **Added SECURITY.md**: Comprehensive security policy and guidelines
+
+### Added
+- 🔐 Security policy documentation
+- 📋 Vulnerability reporting process
+- 🛡️ Security best practices guide
+- 🔮 Future security roadmap
+
 ## [1.0.0] - 2024-07-12
 
 ### Added
