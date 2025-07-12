@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Danh sách Quy luật - RulePy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-list"></i> Danh sách Quy luật</h2>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Thêm mới
+            </a>
+            <div class="btn-group ms-2">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ url_for('export_data', format='json') }}">
+                        <i class="fas fa-file-code"></i> JSON
+                    </a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('export_data', format='csv') }}">
+                        <i class="fas fa-file-csv"></i> CSV
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {% if rules %}
+    <div class="row">
+        {% for rule in rules %}
+        <div class="col-lg-6 mb-4">
+            <div class="card rule-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="badge bg-primary category-badge">{{ rule.category.title() }}</span>
+                    <small class="text-muted">
+                        <i class="fas fa-clock"></i> {{ rule.timestamp.strftime('%d/%m/%Y %H:%M') }}
+                    </small>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title text-primary">
+                        <i class="fas fa-lightbulb"></i> Quy luật #{{ rule.id }}
+                    </h6>
+                    <p class="card-text">{{ rule.description }}</p>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6 class="text-success">
+                                <i class="fas fa-play"></i> Nguyên nhân:
+                            </h6>
+                            <p class="small">{{ rule.trigger }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-danger">
+                                <i class="fas fa-arrow-right"></i> Hệ quả:
+                            </h6>
+                            <p class="small">{{ rule.effect }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if rule.meta_note %}
+                    <div class="mt-3">
+                        <h6 class="text-info">
+                            <i class="fas fa-sticky-note"></i> Meta-note:
+                        </h6>
+                        <p class="small text-muted fst-italic">{{ rule.meta_note }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <form method="POST" action="{{ url_for('delete_rule', rule_id=rule.id) }}" 
+                          onsubmit="return confirm('Bạn có chắc muốn xóa quy luật này?')" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">Chưa có quy luật nào</h4>
+        <p class="text-muted">Hãy bắt đầu ghi lại quy luật đầu tiên của bạn!</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm Quy luật Đầu tiên
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Add some interactive features
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects
+    const cards = document.querySelectorAll('.rule-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

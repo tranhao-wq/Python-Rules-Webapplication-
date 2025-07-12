@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Thống kê & Phân tích - RulePy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">
+        <i class="fas fa-chart-bar"></i> Thống kê & Phân tích Pattern
+    </h2>
+
+    <!-- Summary Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-list fa-2x mb-2"></i>
+                    <h3>{{ total_rules }}</h3>
+                    <p class="mb-0">Tổng Quy luật</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-tags fa-2x mb-2"></i>
+                    <h3>{{ category_counts|length }}</h3>
+                    <p class="mb-0">Lĩnh vực</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-crown fa-2x mb-2"></i>
+                    <h3>
+                        {% if category_counts %}
+                        {{ category_counts.values() | max }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </h3>
+                    <p class="mb-0">Nhiều nhất/Lĩnh vực</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-fire fa-2x mb-2"></i>
+                    <h3>{{ top_words|length }}</h3>
+                    <p class="mb-0">Từ khóa Hot</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row - Simplified without Plotly -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-pie-chart"></i> Phân bố theo Lĩnh vực</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Biểu đồ sẽ được thêm sau khi cài đặt Plotly
+                    </div>
+                    {% if category_counts %}
+                    <div class="progress-stacked">
+                        {% for category, count in category_counts.items() %}
+                        <div class="progress-bar bg-primary" style="width: {{ (count / total_rules * 100) if total_rules > 0 else 0 }}%">
+                            {{ category.title() }}: {{ count }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-line-chart"></i> Timeline Quy luật</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Biểu đồ timeline sẽ được thêm sau
+                    </div>
+                    {% if timeline_data %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr><th>Ngày</th><th>Số quy luật</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for date, count in timeline_data.items() %}
+                                <tr><td>{{ date }}</td><td>{{ count }}</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Words and Category Details -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-fire"></i> Từ khóa xuất hiện nhiều nhất</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_words %}
+                    <div class="list-group list-group-flush">
+                        {% for word, count in top_words %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">{{ word }}</span>
+                            <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">Chưa có dữ liệu từ khóa</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tags"></i> Chi tiết theo Lĩnh vực</h5>
+                </div>
+                <div class="card-body">
+                    {% if category_counts %}
+                    <div class="list-group list-group-flush">
+                        {% for category, count in category_counts.items() %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">{{ category.title() }}</span>
+                            <div>
+                                <span class="badge bg-success rounded-pill me-2">{{ count }}</span>
+                                <span class="text-muted small">
+                                    ({{ "%.1f"|format((count / total_rules * 100) if total_rules > 0 else 0) }}%)
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">Chưa có dữ liệu lĩnh vực</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meta Insights -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5><i class="fas fa-brain"></i> Meta-Insights & Patterns</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="text-primary">🎯 Lĩnh vực Dominant:</h6>
+                            {% if category_counts %}
+                            {% set max_category = category_counts.items() | list | sort(attribute='1', reverse=true) | first %}
+                            <p class="fw-bold">{{ max_category[0].title() }} ({{ max_category[1] }} quy luật)</p>
+                            {% else %}
+                            <p class="text-muted">Chưa có dữ liệu</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-success">📈 Tần suất ghi chép:</h6>
+                            <p>{{ "%.1f"|format(total_rules / 30 if total_rules > 0 else 0) }} quy luật/tháng</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-info">🔍 Từ khóa Hot nhất:</h6>
+                            {% if top_words %}
+                            <p class="fw-bold">"{{ top_words[0][0] }}" ({{ top_words[0][1] }} lần)</p>
+                            {% else %}
+                            <p class="text-muted">Chưa có dữ liệu</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-lightbulb"></i> Gợi ý Meta-Rules:</h6>
+                        <ul class="mb-0">
+                            <li>Bạn có xu hướng quan sát nhiều nhất ở lĩnh vực: <strong>{{ max_category[0].title() if category_counts else "N/A" }}</strong></li>
+                            <li>Pattern ghi chép: {{ "Đều đặn" if total_rules > 10 else "Mới bắt đầu" }}</li>
+                            <li>Khuyến nghị: Thử mở rộng quan sát sang các lĩnh vực khác để có cái nhìn toàn diện hơn</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg me-3">
+            <i class="fas fa-plus"></i> Thêm Quy luật Mới
+        </a>
+        <a href="{{ url_for('rules_list') }}" class="btn btn-outline-secondary btn-lg">
+            <i class="fas fa-list"></i> Xem Tất cả
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Charts will be added when Plotly is installed
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Analytics page loaded - Charts will be available after Plotly installation');
+});
+</script>
+{% endblock %}
